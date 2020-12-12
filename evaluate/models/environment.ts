@@ -11,5 +11,47 @@ namespace models {
                 return null;
             }
         }
+
+        hasSymbol(symbolName: string): boolean {
+            return this.symbols.ContainsKey(symbolName);
+        }
+
+        addSymbol(symbolName: string, value: any, type: string, readonly: boolean): error {
+            let symbol = <symbolObject>{
+                name: symbolName,
+                value: value,
+                type: type,
+                readonly: readonly
+            };
+
+            if (this.hasSymbol(symbolName)) {
+                return <error>{
+                    message: `symbol object '${symbolName}' is already exists in current environment!`
+                }
+            } else {
+                this.symbols.Add(symbolName, symbol);
+                return null;
+            }
+        }
+
+        setSymbol(symbolName: string, value: any): error {
+            if (this.hasSymbol(symbolName)) {
+                let symbol = this.findSymbol(symbolName);
+
+                if (symbol.readonly) {
+                    return <error>{
+                        message: `target symbol '${symbolName}' is readonly!`
+                    }
+                } else {
+                    symbol.value = value;
+                }
+            } else {
+                return <error>{
+                    message: `symbol object '${symbolName}' can not be found in current environment!`
+                }
+            }
+
+            return null;
+        }
     }
 }
