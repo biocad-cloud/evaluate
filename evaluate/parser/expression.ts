@@ -36,10 +36,12 @@ namespace parser {
 
                 return null;
             } else {
-                let token: token = this.tryToken();
+                let token: token = this.tryToken($from(this.buffer));
 
                 if (!isNullOrUndefined(bufferNext)) {
                     this.buffer = [bufferNext];
+                } else {
+                    this.buffer = [];
                 }
 
                 return token;
@@ -58,9 +60,20 @@ namespace parser {
             return false;
         }
 
-        private tryToken(): token {
-            let buffer = $from(this.buffer);
+        private tryToken(buffer: IEnumerator<string>): token {
             let textVal: string = buffer.JoinBy("");
+
+            if (buffer.Count == 1) {
+                let c: string = buffer.ElementAt(0);
+
+                if (c in operators) {
+                    return <token>{ type: "operator", text: c };
+                } else if (c in open) {
+                    return <token>{ type: "open", text: c };
+                } else if (c in close) {
+                    return <token>{ type: "close", text: c };
+                }
+            }
 
             if (expression.isStringLiteral(this.buffer)) {
                 return <token>{ type: "string", text: textVal };
@@ -80,6 +93,11 @@ namespace parser {
                 return this.populateToken(c);
             } else if (c == "(" || c == ")" || c == "[" || c == "]" || c == "{" || c == "}") {
                 return this.populateToken(c);
+            } else if (c == " " || c == "\t" || c == "\n") {
+                return this.populateToken(null);
+            } else {
+                this.buffer.push(c);
+                return null;
             }
         }
     }

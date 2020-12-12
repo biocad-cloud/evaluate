@@ -7,6 +7,6 @@ namespace parser {
             }
         }
 
-
+        console.table(tokens);
     }
 }

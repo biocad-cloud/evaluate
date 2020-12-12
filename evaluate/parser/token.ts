@@ -6,4 +6,9 @@ namespace parser {
         type: tokens;
         text: string;
     }
+
+    export const operators = { "+": true, "-": true, "*": true, "/": true, "^": true, "%": true };
+    export const open = { "(": true, "{": true, "[": true };
+    export const close = { ")": true, "}": true, "]": true };
+
 }
