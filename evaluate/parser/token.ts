@@ -1,6 +1,6 @@
 namespace parser {
 
-    export type tokens = "number" | "string" | "keyword" | "operator" | "boolean" | "symbol";
+    export type tokens = "invalid" | "number" | "string" | "keyword" | "operator" | "boolean" | "symbol" | "open" | "close";
 
     export interface token {
         type: tokens;

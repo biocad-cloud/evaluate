@@ -5,6 +5,15 @@ namespace models {
         eval(env: environment): any;
     }
 
+    export class errorExpression implements expression {
+
+        constructor(public message: string) { }
+
+        eval(env: environment) {
+            return <error>{ message: this.message };
+        }
+    }
+
     export class literalExpression implements expression {
 
         constructor(public value: number | boolean | string) { };
@@ -22,7 +31,10 @@ namespace models {
             let symbol = env.findSymbol(this.symbolName);
 
             if (isNullOrUndefined(symbol)) {
-                return <error>{ message: `not able to found symbol '${this.symbolName}'!` };
+                return <error>{
+                    message: `not able to found symbol '${this.symbolName}'!`,
+                    code: error_symbolNotFound
+                };
             } else {
                 return symbol.value;
             }

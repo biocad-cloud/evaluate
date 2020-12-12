@@ -26,7 +26,8 @@ namespace models {
 
             if (this.hasSymbol(symbolName)) {
                 return <error>{
-                    message: `symbol object '${symbolName}' is already exists in current environment!`
+                    message: `symbol object '${symbolName}' is already exists in current environment!`,
+                    code: error_symbolConflicts
                 }
             } else {
                 this.symbols.Add(symbolName, symbol);
@@ -40,14 +41,16 @@ namespace models {
 
                 if (symbol.readonly) {
                     return <error>{
-                        message: `target symbol '${symbolName}' is readonly!`
+                        message: `target symbol '${symbolName}' is readonly!`,
+                        code: error_symbolReadOnly
                     }
                 } else {
                     symbol.value = value;
                 }
             } else {
                 return <error>{
-                    message: `symbol object '${symbolName}' can not be found in current environment!`
+                    message: `symbol object '${symbolName}' can not be found in current environment!`,
+                    code: error_symbolNotFound
                 }
             }
 
