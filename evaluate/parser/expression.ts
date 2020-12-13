@@ -60,6 +60,10 @@ namespace parser {
             return false;
         }
 
+        private static isWhiteSpace(text: string) {
+            return text == " " || text == "\t" || text == "\n"
+        }
+
         private tryToken(buffer: IEnumerator<string>): token {
             let textVal: string = buffer.JoinBy("");
 
@@ -93,8 +97,10 @@ namespace parser {
                 return this.populateToken(c);
             } else if (c == "(" || c == ")" || c == "[" || c == "]" || c == "{" || c == "}") {
                 return this.populateToken(c);
-            } else if (c == " " || c == "\t" || c == "\n") {
+            } else if (expression.isWhiteSpace(c)) {
                 return this.populateToken(null);
+            } else if (this.buffer.length == 1 && (expression.isWhiteSpace(this.buffer[0]) || this.buffer[0] in operators || this.buffer[0] in open || this.buffer[0] in close)) {
+                return this.populateToken(c);
             } else {
                 this.buffer.push(c);
                 return null;
