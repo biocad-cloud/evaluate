@@ -6,6 +6,10 @@ namespace models {
 
     export class binaryExpression extends expression {
 
+        get class(): expressionClass {
+            return "binary";
+        }
+
         constructor(public left: expression, public bin: operator, public right: expression) {
             super();
         }

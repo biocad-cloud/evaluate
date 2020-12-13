@@ -4,12 +4,16 @@ namespace models {
 
     export class functionCallsExpression extends expression {
 
+        get class(): expressionClass {
+            return "function";
+        }
+
         constructor(public funcName: string, public parameters: expression[]) {
             super();
         }
 
         eval(env: environment) {
-            let funcSymbol: symbolObject = env.findSymbol(this.funcName);
+            let funcSymbol: symbolObject = env.findFunction(this.funcName);
 
             if (isNullOrUndefined(funcSymbol)) {
                 return <error>{

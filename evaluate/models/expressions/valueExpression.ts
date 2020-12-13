@@ -4,6 +4,10 @@ namespace models {
 
     export class literalExpression extends expression {
 
+        get class(): expressionClass {
+            return "literal";
+        }
+
         constructor(public value: number | boolean | string, public type: parser.tokens) {
             super();
         };
@@ -18,6 +22,10 @@ namespace models {
     }
 
     export class symbolExpression extends expression {
+
+        get class(): expressionClass {
+            return "symbol";
+        }
 
         constructor(public symbolName: string) {
             super();

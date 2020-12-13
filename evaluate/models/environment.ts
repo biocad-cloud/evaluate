@@ -11,7 +11,7 @@ namespace models {
 
         findFunction(symbolName: string): symbolObject {
             if (this.functions.ContainsKey(symbolName)) {
-                return this.symbols.Item(symbolName);
+                return this.functions.Item(symbolName);
             } else {
                 return null;
             }
