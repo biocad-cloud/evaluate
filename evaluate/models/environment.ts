@@ -5,7 +5,7 @@ namespace models {
         readonly symbols = new Dictionary<symbolObject>();
         readonly functions = new Dictionary<symbolObject>();
 
-        constructor() {
+        constructor(public stackName: string = "n/a") {
             this.functions.Add("floor", <symbolObject>{ name: "floor", value: Math.floor, type: "function", readonly: true });
         }
 
