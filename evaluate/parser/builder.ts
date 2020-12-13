@@ -11,16 +11,17 @@ namespace parser {
             return buildSingle(tokens[0]);
         }
 
-        let blocks: token[][] = splitTopLevelStack(tokens);
-
-        if (blocks.length == 1 && blocks[0].length == 1 && blocks[0][0].type == "invalid") {
-            return new models.errorExpression(blocks[0][0].text);
-        }
+        // let blocks: token[][] = splitTopLevelStack(tokens, t => t.type == "open" || t.type == "close");
+        let blocks: token[][] = splitTopLevelStack(tokens, t => t.type == "operator");
 
         console.log(blocks);
 
-        for (let block of blocks) {
-
+        if (blocks.length == 1 && blocks[0].length == 1 && blocks[0][0].type == "invalid") {
+            return new models.errorExpression(blocks[0][0].text);
+        } else if (blocks.length == 1) {
+            return buildExpression(blocks[0]);
+        } else {
+            return buildBinaryTree(blocks);
         }
     }
 
@@ -28,24 +29,79 @@ namespace parser {
         switch (token.type) {
             case "number": return new models.literalExpression(parseFloat(token.text), token.type);
             case "string": return new models.literalExpression(token.text, token.type);
-            case "operator": return new models.errorExpression(`invalid token ${token.type}::'${token.text}'!`);
             case "boolean": return new models.literalExpression(parseBoolean(token.text), token.type);
+            case "symbol": return new models.symbolExpression(token.text);
+
+            default:
+                return new models.errorExpression(`invalid token ${token.type}::'${token.text}'!`);
         }
     }
 
-    function buildBinaryTree(blocks: token[][]) {
+    const operatorPriority: string[] = ["^", "*/%", "+-"]
 
+    function joinNegative(tokens: token[]) {
+        if (tokens.length >= 2) {
+            let startText: string = tokens[0].text;
+
+            if (tokens[0].type == "operator" && (startText == "+" || startText == "-") && tokens[1].type == "number") {
+                let number = <token>{
+                    type: "number",
+                    text: startText == "+" ? tokens[1].text : (-parseFloat(tokens[1].text)).toString()
+                }
+
+                let tmp = [number];
+
+                for (let t of $from(tokens).Skip(2).ToArray()) {
+                    tmp.push(t);
+                }
+
+                return tmp;
+            }
+        }
+
+        return tokens;
     }
 
-    function splitTopLevelStack(tokens: token[]) {
+    function joinNegativeBlocks(tokenBlocks: token[][], buf: builderBuffer[], oplist: string[]) {
+        let syntaxResult: models.expression;
+        let index: number = 0;
+
+        for (let i: number = 0; i < tokenBlocks.length; i++) {
+            let block = joinNegative(tokenBlocks[i]);
+
+            console.log(block);
+
+            if (i++ % 2 == 0) {
+
+            } else {
+                buf.push()
+            }
+        }
+    }
+
+    interface builderBuffer {
+        exp: models.expression;
+        op: string;
+    }
+
+    function buildBinaryTree(blocks: token[][]): models.expression {
+        let buf: builderBuffer[] = [];
+        let oplist: string[] = [];
+
+        joinNegativeBlocks(blocks, buf, oplist);
+    }
+
+    function splitTopLevelStack(tokens: token[], isDeli: TestDelimiter) {
         if (tokens.length == 1) {
             return [tokens];
         } else {
-            return splitTopLevelStackInternal(tokens);
+            return splitTopLevelStackInternal(tokens, isDeli);
         }
     }
 
-    function splitTopLevelStackInternal(tokens: token[]) {
+    interface TestDelimiter { (token: token): boolean; }
+
+    function splitTopLevelStackInternal(tokens: token[], isDeli: TestDelimiter) {
         let blocks: token[][] = [];
         let openStack: string[] = [];
         let buf: token[] = [];
@@ -74,7 +130,7 @@ namespace parser {
                 }
             }
 
-            if (token.type == "open" || token.type == "close") {
+            if (isDeli(token)) {
                 if (openStack.length == 0) {
                     // is top level
                     if (buf.length > 0) {
