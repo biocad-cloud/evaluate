@@ -68,7 +68,7 @@ namespace parser {
         return tokens;
     }
 
-    function joinNegativeBlocks(tokenBlocks: token[][], oplist: string[]) {
+    function joinNegativeBlocks(tokenBlocks: token[][]) {
         let syntaxResult: models.expression;
         let tokens: token[];
         let buf: builderBuffer[] = [];
@@ -95,13 +95,12 @@ namespace parser {
     }
 
     interface builderBuffer {
-        exp: models.expression;
-        op: string;
+        exp?: models.expression;
+        op?: string;
     }
 
     function buildBinaryTree(blocks: token[][]): models.expression {
-        let oplist: string[] = [];
-        let buf: builderBuffer[] = joinNegativeBlocks(blocks, oplist);
+        let buf: builderBuffer[] = joinNegativeBlocks(blocks);
 
         if (buf.length == 1) {
             if (!isNullOrUndefined(buf[0].exp)) {
@@ -111,7 +110,53 @@ namespace parser {
             }
         }
 
-        console.log(buf);
+        if (buf.length == 3) {
+            return new models.binaryExpression(buf[0].exp, <any>buf[1].op, buf[2].exp);
+        } else {
+            return processOperators(buf);
+        }
+    }
+
+    function processOperator(buf: builderBuffer[], oplist: string[]): builderBuffer[] {
+        let nextBuf: builderBuffer[] = [];
+
+        for (let i: number = 0; i < buf.length; i++) {
+            let token = buf[i];
+
+            if (!isNullOrUndefined(token.op) && oplist.indexOf(token.op) > -1) {
+                let bin = new models.binaryExpression(buf[i - 1].exp, <any>token.op, buf[i + 1].exp);
+
+                nextBuf[nextBuf.length - 1] = <builderBuffer>{ exp: bin };
+            } else {
+                nextBuf.push(token);
+            }
+        }
+
+        return nextBuf;
+    }
+
+    function processOperators(buf: builderBuffer[]): models.expression {
+        for (let op of operatorPriority) {
+            let oplist: string[] = <string[]>Strings.ToCharArray(op, false);
+            let nextBuf = processOperator(buf, oplist);
+
+            while (nextBuf.length != buf.length) {
+                buf = nextBuf;
+                nextBuf = processOperator(buf, oplist);
+            }
+        }
+
+        if (buf.length == 1) {
+            let token = buf[0];
+
+            if (!isNullOrUndefined(token.exp)) {
+                return token.exp;
+            } else {
+                return new models.errorExpression(`invalid syntax!`);
+            }
+        } else {
+            return new models.errorExpression(`invalid syntax!`);
+        }
     }
 
     function splitTopLevelStack(tokens: token[], isDeli: TestDelimiter) {
