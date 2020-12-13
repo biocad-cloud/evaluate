@@ -36,13 +36,23 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="models\" />
+    <Folder Include="models\expressions\" />
     <Folder Include="parser\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="models\expression.ts">
+    <TypeScriptCompile Include="models\expressions\expression.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="models\environment.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="models\expressions\functionCallsExpression.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="models\expressions\binaryExpression.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="models\expressions\valueExpression.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="models\symbol.ts">

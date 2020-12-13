@@ -1,5 +1,7 @@
 /// <reference path="../../build/linq.d.ts" />
 
+/// <reference path="models/expressions/expression.ts" />
+
 function parseExpression(text: string): models.expression {
     let tokens = new parser.expression(text).getTokens();
     let result: models.expression = parser.buildExpression(tokens);
