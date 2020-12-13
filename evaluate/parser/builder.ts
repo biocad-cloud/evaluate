@@ -7,14 +7,20 @@ namespace parser {
             }
         }
 
-        if (tokens.length == 0) {
+        if (tokens.length == 1) {
             return buildSingle(tokens[0]);
         }
 
-        // let blocks: token[][] = splitTopLevelStack(tokens, t => t.type == "open" || t.type == "close");
-        let blocks: token[][] = splitTopLevelStack(tokens, t => t.type == "operator");
+        let blocks: token[][] = splitTopLevelStack(tokens, t => t.type == "open" || t.type == "close");
+        let tmp: token[] = [];
 
-        console.log(blocks);
+        for (let block of blocks) {
+            for (let token of joinNegative(block)) {
+                tmp.push(token);
+            }
+        }
+
+        blocks = splitTopLevelStack(tmp, t => t.type == "operator");
 
         if (blocks.length == 1 && blocks[0].length == 1 && blocks[0][0].type == "invalid") {
             return new models.errorExpression(blocks[0][0].text);
@@ -62,21 +68,30 @@ namespace parser {
         return tokens;
     }
 
-    function joinNegativeBlocks(tokenBlocks: token[][], buf: builderBuffer[], oplist: string[]) {
+    function joinNegativeBlocks(tokenBlocks: token[][], oplist: string[]) {
         let syntaxResult: models.expression;
-        let index: number = 0;
+        let tokens: token[];
+        let buf: builderBuffer[] = [];
 
         for (let i: number = 0; i < tokenBlocks.length; i++) {
             let block = joinNegative(tokenBlocks[i]);
 
-            console.log(block);
-
-            if (i++ % 2 == 0) {
-
+            if (block.length == 2) {
+                syntaxResult = buildSingle(block[0]);
+                buf.push(<builderBuffer>{ exp: syntaxResult });
+                buf.push(<builderBuffer>{ op: block[1].text });
+            } else if (block.length == 1) {
+                syntaxResult = buildExpression(block);
+                buf.push(<builderBuffer>{ exp: syntaxResult });
             } else {
-                buf.push()
+                tokens = $from(block).Skip(1).Take(block.length - 3).ToArray();
+                syntaxResult = buildExpression(tokens);
+                buf.push(<builderBuffer>{ exp: syntaxResult });
+                buf.push(<builderBuffer>{ op: block[block.length - 1].text });
             }
         }
+
+        return buf;
     }
 
     interface builderBuffer {
@@ -85,10 +100,18 @@ namespace parser {
     }
 
     function buildBinaryTree(blocks: token[][]): models.expression {
-        let buf: builderBuffer[] = [];
         let oplist: string[] = [];
+        let buf: builderBuffer[] = joinNegativeBlocks(blocks, oplist);
 
-        joinNegativeBlocks(blocks, buf, oplist);
+        if (buf.length == 1) {
+            if (!isNullOrUndefined(buf[0].exp)) {
+                return buf[0].exp;
+            } else {
+                return new models.errorExpression(`invalid token '${buf[0].op}'!`);
+            }
+        }
+
+        console.log(buf);
     }
 
     function splitTopLevelStack(tokens: token[], isDeli: TestDelimiter) {
