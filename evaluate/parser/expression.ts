@@ -93,9 +93,9 @@ namespace parser {
         }
 
         private walkChar(c: string): token {
-            if (c == "+" || c == "-" || c == "*" || c == "/" || c == "^" || c == "%") {
+            if (c in operators) {
                 return this.populateToken(c);
-            } else if (c == "(" || c == ")" || c == "[" || c == "]" || c == "{" || c == "}") {
+            } else if (c in open || c in close) {
                 return this.populateToken(c);
             } else if (expression.isWhiteSpace(c)) {
                 return this.populateToken(null);
