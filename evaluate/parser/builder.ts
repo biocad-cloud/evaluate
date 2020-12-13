@@ -1,12 +1,14 @@
 namespace parser {
 
     export function buildExpression(tokens: token[]): models.expression {
-        console.table(tokens);
-
         for (let token of tokens) {
             if (token.type == "invalid") {
                 return new models.errorExpression(`invalid expression token '${token.text}'`);
             }
+        }
+
+        if (tokens.length == 0) {
+            return buildSingle(tokens[0]);
         }
 
         let blocks: token[][] = splitTopLevelStack(tokens);
@@ -20,6 +22,19 @@ namespace parser {
         for (let block of blocks) {
 
         }
+    }
+
+    function buildSingle(token: token) {
+        switch (token.type) {
+            case "number": return new models.literalExpression(parseFloat(token.text), token.type);
+            case "string": return new models.literalExpression(token.text, token.type);
+            case "operator": return new models.errorExpression(`invalid token ${token.type}::'${token.text}'!`);
+            case "boolean": return new models.literalExpression(parseBoolean(token.text), token.type);
+        }
+    }
+
+    function buildBinaryTree(blocks: token[][]) {
+
     }
 
     function splitTopLevelStack(tokens: token[]) {

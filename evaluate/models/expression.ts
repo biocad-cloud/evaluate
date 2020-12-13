@@ -16,7 +16,7 @@ namespace models {
 
     export class literalExpression implements expression {
 
-        constructor(public value: number | boolean | string) { };
+        constructor(public value: number | boolean | string, public type: parser.tokens) { };
 
         eval(env: environment) {
             return this.value;
