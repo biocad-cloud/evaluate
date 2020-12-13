@@ -126,6 +126,7 @@ namespace parser {
             if (!isNullOrUndefined(token.op) && oplist.indexOf(token.op) > -1) {
                 let bin = new models.binaryExpression(buf[i - 1].exp, <any>token.op, buf[i + 1].exp);
 
+                i++;
                 nextBuf[nextBuf.length - 1] = <builderBuffer>{ exp: bin };
             } else {
                 nextBuf.push(token);
@@ -143,6 +144,14 @@ namespace parser {
             while (nextBuf.length != buf.length) {
                 buf = nextBuf;
                 nextBuf = processOperator(buf, oplist);
+
+                if (nextBuf.length == 1) {
+                    break;
+                }
+            }
+
+            if (nextBuf.length == 1) {
+                break;
             }
         }
 
