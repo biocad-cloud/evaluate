@@ -1,31 +1,46 @@
 namespace models {
 
-    export interface expression {
+    export abstract class expression {
 
-        eval(env: environment): any;
+        abstract eval(env: environment): any;
+        abstract toString(): string;
     }
 
-    export class errorExpression implements expression {
+    export class errorExpression extends expression {
 
-        constructor(public message: string) { }
+        constructor(public message: string) {
+            super();
+        }
 
         eval(env: environment) {
             return <error>{ message: this.message };
         }
+
+        toString() {
+            return `[ERROR] ${this.message}`
+        }
     }
 
-    export class literalExpression implements expression {
+    export class literalExpression extends expression {
 
-        constructor(public value: number | boolean | string, public type: parser.tokens) { };
+        constructor(public value: number | boolean | string, public type: parser.tokens) {
+            super();
+        };
 
         eval(env: environment) {
             return this.value;
         }
+
+        toString() {
+            return `<${this.type}>${this.value.toString()}`;
+        }
     }
 
-    export class symbolExpression implements expression {
+    export class symbolExpression extends expression {
 
-        constructor(public symbolName: string) { }
+        constructor(public symbolName: string) {
+            super();
+        }
 
         eval(env: environment) {
             let symbol = env.findSymbol(this.symbolName);
@@ -39,13 +54,19 @@ namespace models {
                 return symbol.value;
             }
         }
+
+        toString() {
+            return `&${this.symbolName}`;
+        }
     }
 
     export type operator = "+" | "-" | "*" | "/" | "^" | "%";
 
-    export class binaryExpression implements expression {
+    export class binaryExpression extends expression {
 
-        constructor(public left: expression, public bin: operator, public right: expression) { }
+        constructor(public left: expression, public bin: operator, public right: expression) {
+            super();
+        }
 
         eval(env: environment) {
             let left = this.left.eval(env);
@@ -64,6 +85,10 @@ namespace models {
                         message: `unknown binary operator '${this.bin}'!`
                     }
             }
+        }
+
+        toString() {
+            return `(${this.left.toString()} ${this.bin} ${this.right.toString()})`;
         }
 
         private add(x, y, env: environment) {
