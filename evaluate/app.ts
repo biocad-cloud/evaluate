@@ -6,9 +6,9 @@ function parseExpression(text: string): models.expression {
     let tokens = new parser.expression(text).getTokens();
     let result: models.expression = parser.buildExpression(tokens);
 
-    TypeScript.logging.log(`the input raw expression: ${text}`, TypeScript.ConsoleColors.Magenta);
-    TypeScript.logging.log(`the result expression: ${result.toString()}`, TypeScript.ConsoleColors.DarkCyan);
-    TypeScript.logging.log(result);
+    // TypeScript.logging.log(`the input raw expression: ${text}`, TypeScript.ConsoleColors.Magenta);
+    // TypeScript.logging.log(`the result expression: ${result.toString()}`, TypeScript.ConsoleColors.DarkCyan);
+    // TypeScript.logging.log(result);
 
     return result;
 }
