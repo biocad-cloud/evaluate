@@ -20,5 +20,3 @@ function environment(symbols: {} = {}) {
 
     return env;
 }
-
-$ts.mode = Modes.debug;
