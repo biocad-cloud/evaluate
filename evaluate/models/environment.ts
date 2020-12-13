@@ -3,6 +3,19 @@ namespace models {
     export class environment {
 
         readonly symbols = new Dictionary<symbolObject>();
+        readonly functions = new Dictionary<symbolObject>();
+
+        constructor() {
+            this.functions.Add("floor", <symbolObject>{ name: "floor", value: Math.floor, type: "function", readonly: true });
+        }
+
+        findFunction(symbolName: string): symbolObject {
+            if (this.functions.ContainsKey(symbolName)) {
+                return this.symbols.Item(symbolName);
+            } else {
+                return null;
+            }
+        }
 
         findSymbol(symbolName: string): symbolObject {
             if (this.symbols.ContainsKey(symbolName)) {
