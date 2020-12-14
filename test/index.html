@@ -1,4 +1,6 @@
 <script src="../../build/linq.min.js"></script>
 <script src="../../build/evaluate.js"></script>
 
+<script>console.log(parseExpression("	8+(x / 80)*8").eval(environment({ x : 5})))</script>
+
 <script>console.log(parseExpression("-3  * ((x + 5) ^ 2 + 10) / 2 * 9").eval(environment({ x : 5})))</script>
