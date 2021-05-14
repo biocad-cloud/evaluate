@@ -105,3 +105,4 @@ dist
 *.sqlite
 .vs/evaluate/v16/.suo
 evaluate/.vs/evaluate/v16/.suo
+*.dll
